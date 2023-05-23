@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 import colossalai
 from colossalai.booster import Booster
-from colossalai.booster.plugin import GeminiPlugin, LowLevelZeroPlugin, TorchDDPPlugin
+from colossalai.booster.plugin import GeminiPlugin, LowLevelZeroPlugin, TorchDDPPlugin, TorchFSDPPlugin
 from colossalai.booster.plugin.dp_plugin_base import DPPluginBase
 from colossalai.cluster import DistCoordinator
 from colossalai.nn.optimizer import HybridAdam
@@ -104,7 +104,7 @@ def main():
                         '--plugin',
                         type=str,
                         default='torch_ddp',
-                        choices=['torch_ddp', 'torch_ddp_fp16', 'low_level_zero'],
+                        choices=['torch_fsdp', 'torch_ddp', 'torch_ddp_fp16', 'low_level_zero'],
                         help="plugin to use")
     parser.add_argument('-r', '--resume', type=int, default=-1, help="resume from the epoch's checkpoint")
     parser.add_argument('-c', '--checkpoint', type=str, default='./checkpoint', help="checkpoint directory")
@@ -140,6 +140,8 @@ def main():
         booster_kwargs['mixed_precision'] = 'fp16'
     if args.plugin.startswith('torch_ddp'):
         plugin = TorchDDPPlugin()
+    elif args.plugin.startswith('torch_fsdp'):
+        plugin = TorchFSDPPlugin()
     elif args.plugin == 'gemini':
         plugin = GeminiPlugin(placement_policy='cuda', strict_ddp_mode=True, initial_scale=2**5)
     elif args.plugin == 'low_level_zero':

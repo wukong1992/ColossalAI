@@ -13,7 +13,7 @@ from transformers import AutoConfig, BertForSequenceClassification, get_linear_s
 
 import colossalai
 from colossalai.booster import Booster
-from colossalai.booster.plugin import GeminiPlugin, LowLevelZeroPlugin, TorchDDPPlugin
+from colossalai.booster.plugin import GeminiPlugin, LowLevelZeroPlugin, TorchDDPPlugin, TorchFSDPPlugin
 from colossalai.cluster import DistCoordinator
 from colossalai.nn.optimizer import HybridAdam
 from colossalai.utils import get_current_device
@@ -102,7 +102,7 @@ def main():
                         '--plugin',
                         type=str,
                         default='torch_ddp',
-                        choices=['torch_ddp', 'torch_ddp_fp16', 'gemini', 'low_level_zero'],
+                        choices=['torch_fsdp', 'torch_ddp', 'torch_ddp_fp16', 'gemini', 'low_level_zero'],
                         help="plugin to use")
     parser.add_argument('--target_f1', type=float, default=None, help="target f1 score. Raise exception if not reached")
     args = parser.parse_args()
@@ -125,6 +125,8 @@ def main():
         booster_kwargs['mixed_precision'] = 'fp16'
     if args.plugin.startswith('torch_ddp'):
         plugin = TorchDDPPlugin()
+    if args.plugin.startswith('torch_fsdp'):
+        plugin = TorchFSDPPlugin()
     elif args.plugin == 'gemini':
         plugin = GeminiPlugin(placement_policy='cuda', strict_ddp_mode=True, initial_scale=2**5)
     elif args.plugin == 'low_level_zero':

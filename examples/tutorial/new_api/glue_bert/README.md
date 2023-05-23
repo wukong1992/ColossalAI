@@ -6,7 +6,7 @@ This example provides a training script, which provides an example of finetuning
 
 - Training Arguments
   - `-t`, `--task`: GLUE task to run. Defaults to `mrpc`.
-  - `-p`, `--plugin`: Plugin to use. Choices: `torch_ddp`, `torch_ddp_fp16`, `gemini`, `low_level_zero`. Defaults to `torch_ddp`.
+  - `-p`, `--plugin`: Plugin to use. Choices: `torch_fsdp`, `torch_ddp`, `torch_ddp_fp16`, `gemini`, `low_level_zero`. Defaults to `torch_ddp`.
   - `--target_f1`: Target f1 score. Raise exception if not reached. Defaults to `None`.
 
 
